@@ -1,0 +1,23 @@
+{
+  "properties": [
+    {
+      "name": "section",
+      "type": "java.lang.String",
+      "description": "Description for section."
+    },
+    {
+      "name": "app.pause",
+      "type": "java.lang.String",
+      "description": "Description for app.pause."
+    },
+    {
+      "name": "generate.section",
+      "type": "java.lang.String",
+      "description": "Description for generate.section."
+    },
+    {
+      "name": "generate.geo_class",
+      "type": "java.lang.String",
+      "description": "Description for generate.geo_class."
+    }
+  ] }
