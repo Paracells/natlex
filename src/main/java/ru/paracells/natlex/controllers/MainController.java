@@ -13,7 +13,6 @@ import ru.paracells.natlex.repository.SectionRepository;
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
@@ -65,9 +64,9 @@ public class MainController {
 
     // Add API GET /sections/by-code?code=..
     @GetMapping(value = "/sections/by-code", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Set<String> findByCode(@RequestParam String code) {
+    public List<String> findByCode(@RequestParam String code) {
         List<Section> list = sectionRepository.findSectionsByGeologicalСlassesCode(code);
-        Set<String> collect = list.stream().map(Section::getName).collect(Collectors.toSet());
+        List<String> collect = list.stream().map(Section::getName).collect(Collectors.toList());
         return collect;
     }
 
