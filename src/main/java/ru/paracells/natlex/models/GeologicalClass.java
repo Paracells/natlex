@@ -7,32 +7,38 @@ import java.io.Serializable;
 
 
 @Entity
-@Table(name = "geologicalclasses")
+@Table(name = "geoclasses")
 public class GeologicalClass implements Serializable {
 
+
+    @JsonIgnore
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonIgnore
     private Long id;
 
     @Column(name = "name")
     private String name;
+
     @Column(name = "code")
     private String code;
 
-    public GeologicalClass(String name, String code) {
-        this.name = name;
-        this.code = code;
-    }
 
-    @JsonIgnore
-    @Column(name = "geo_section")
-    private String geo_section;
+   /* @ManyToOne
+    @JoinColumn(name = "section_id", insertable = false, updatable = false)
+    private Section section;*/
+
 
     public GeologicalClass() {
-
     }
 
+    /*  public Section getSection() {
+          return section;
+      }
+
+      public void setSection(Section section) {
+          this.section = section;
+      }
+  */
 
     public Long getId() {
         return id;
@@ -56,21 +62,5 @@ public class GeologicalClass implements Serializable {
 
     public void setCode(String code) {
         this.code = code;
-    }
-
-    public String getGeo_section() {
-        return geo_section;
-    }
-
-    public void setGeo_section(String geo_section) {
-        this.geo_section = geo_section;
-    }
-
-    @Override
-    public String toString() {
-        return "GeologicalClass{ " +
-                "name = '" + name + '\'' +
-                ", code = '" + code + '\'' +
-                '}';
     }
 }

@@ -75,8 +75,7 @@ public class XLSServiceImpl implements XLSService {
                     geo_cls.setName(value);
                 } else if (value.contains("GC")) {
                     geo_cls.setCode(value);
-                    geo_cls.setGeo_section(section.getName());
-                    section.getGeologicalСlasses().add(geo_cls);
+                    section.getGeoClasses().add(geo_cls);
                     geo_cls = new GeologicalClass();
                 } else {
                     return null;
@@ -114,7 +113,7 @@ public class XLSServiceImpl implements XLSService {
             leftCell.setCellValue(section.getName());
             int logicCell = 1;
             int countSection = 1;
-            List<GeologicalClass> geologicalClasses = new ArrayList<>(section.getGeologicalСlasses());
+            List<GeologicalClass> geologicalClasses = new ArrayList<>(section.getGeoClasses());
             logger.info(section.getName());
             try {
                 Thread.sleep(pause);

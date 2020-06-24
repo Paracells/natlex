@@ -21,9 +21,8 @@ public class UtilsServiceImpl implements UtilsService {
             GeologicalClass geologicalClass = new GeologicalClass();
             geologicalClass.setName("Geo Class " + value + i);
             geologicalClass.setCode("GC" + value + i);
-            section.getGeologicalСlasses().add(geologicalClass);
-            geologicalClass.setGeo_section(section.getName());
-            section.getGeologicalСlasses().add(geologicalClass);
+            section.getGeoClasses().add(geologicalClass);
+            section.getGeoClasses().add(geologicalClass);
         }
     }
 }

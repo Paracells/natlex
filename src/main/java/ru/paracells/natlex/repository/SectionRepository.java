@@ -10,11 +10,10 @@ import java.util.Optional;
 @Repository
 public interface SectionRepository extends JpaRepository<Section, String> {
 
-    List<Section> findSectionsByGeologicalСlassesCode(String  code);
-
     Optional<Section> findSectionByName(String name);
 
     void deleteSectionByName(String name);
 
 
+    List<Section> findSectionByJobid(Integer jobId);
 }

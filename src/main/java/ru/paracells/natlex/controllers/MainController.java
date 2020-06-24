@@ -13,7 +13,6 @@ import ru.paracells.natlex.service.UtilsService;
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RestController
 public class MainController {
@@ -50,13 +49,13 @@ public class MainController {
     }
 
 
-    // Add API GET /sections/by-code?code=..
+  /*  // Add API GET /sections/by-code?code=..
     @GetMapping(value = "/sections/by-code", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<String> findByCode(@RequestParam String code) {
         List<Section> list = sectionRepository.findSectionsByGeologicalСlassesCode(code);
         List<String> collect = list.stream().map(Section::getName).collect(Collectors.toList());
         return collect;
-    }
+    }*/
 
 
     @PostMapping("/create")
@@ -83,7 +82,7 @@ public class MainController {
         if (byId.isPresent()) {
             Section updated = byId.get();
             updated.setName(section.getName());
-            updated.setGeologicalСlasses(section.getGeologicalСlasses());
+            updated.setGeoClasses(section.getGeoClasses());
             sectionRepository.save(updated);
             return updated;
         }

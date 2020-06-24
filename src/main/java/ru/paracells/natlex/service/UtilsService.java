@@ -1,4 +1,8 @@
 package ru.paracells.natlex.service;
 
-public class UtilsService {
+import ru.paracells.natlex.models.Section;
+
+
+public interface UtilsService {
+    void addToList(Section section, int value);
 }
