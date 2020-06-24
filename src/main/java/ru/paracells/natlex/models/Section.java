@@ -19,13 +19,13 @@ public class Section implements Serializable {
     @Column(name = "name")
     private String name;
 
-    @JsonIgnore
+   /* @JsonIgnore
     @Column(name = "jobid")
     private Integer jobid;
 
     @JsonIgnore
     @Column(name = "jobstate")
-    private String jobstate;
+    private String jobstate;*/
 /*
     // name - это как колонка будет выглядить в таблице
     // referencedColumnName - это ссылка на таблицу, с которой связываемся
@@ -38,14 +38,6 @@ public class Section implements Serializable {
     List<GeologicalClass> geoClasses = new ArrayList<>();
 
     public Section() {
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public String getName() {
@@ -72,7 +64,7 @@ public class Section implements Serializable {
         this.geoClasses = geoClasses;
     }
 
-    public Integer getJobid() {
+   /* public Integer getJobid() {
         return jobid;
     }
 
@@ -86,13 +78,12 @@ public class Section implements Serializable {
 
     public void setJobstate(String jobstate) {
         this.jobstate = jobstate;
-    }
+    }*/
 
     @Override
     public String toString() {
         return "Section{" +
                 "name='" + name + '\'' +
-                ", jobstate=" + jobstate +
                 ", geoClasses=" + geoClasses +
                 '}';
     }

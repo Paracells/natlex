@@ -16,9 +16,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.paracells.natlex.controllers.MainController;
 import ru.paracells.natlex.models.GeologicalClass;
+import ru.paracells.natlex.models.Job;
 import ru.paracells.natlex.models.Section;
+import ru.paracells.natlex.repository.JobRepository;
 import ru.paracells.natlex.repository.SectionRepository;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -41,14 +44,17 @@ public class SaveAndReadServiceImpl implements SaveAndReadService {
 
     private SectionRepository sectionRepository;
 
+    private JobRepository jobRepository;
+
     @Autowired
-    public SaveAndReadServiceImpl(SectionRepository sectionRepository) {
+    public SaveAndReadServiceImpl(SectionRepository sectionRepository, JobRepository jobRepository) {
         this.sectionRepository = sectionRepository;
+        this.jobRepository = jobRepository;
     }
 
     @Override
     @Async
-    public void read(MultipartFile file, int jobId) {
+    public void read(MultipartFile file, Long jobId) {
 
         try {
             book = (XSSFWorkbook) WorkbookFactory.create(file.getInputStream());
@@ -56,11 +62,20 @@ public class SaveAndReadServiceImpl implements SaveAndReadService {
             e.printStackTrace();
         }
 
+        Job job = new Job();
+
+        job.setId(jobId);
+        job.setJobname("import");
+        job.setJobstate(State.IN_PROGRESS.getState());
+        jobRepository.save(job);
+
         // Does we have section in title?
         XSSFSheet sheet = book.getSheetAt(0);
         XSSFRow checkCellRowForSection = sheet.getRow(0);
         if (!checkCellRowForSection.getCell(0).toString().toLowerCase().contains("section")) {
-            // -----
+            job.setJobstate(State.ERROR.getState());
+            jobRepository.save(job);
+            return;
         }
         sheet.removeRow(sheet.getRow(0));
 
@@ -79,8 +94,10 @@ public class SaveAndReadServiceImpl implements SaveAndReadService {
                 String value = cell.getStringCellValue();
                 if (value.contains("Section")) {
                     section.setName(value);
-                    section.setJobid(jobId);
-                    section.setJobstate(State.IN_PROGRESS.getState());
+
+
+                /*    section.setJobid(jobId);
+                    section.setJobstate(State.IN_PROGRESS.getState());*/
                 } else if (value.contains("Geo")) {
                     geologicalClass.setName(value);
                 } else if (value.contains("GC")) {
@@ -95,20 +112,39 @@ public class SaveAndReadServiceImpl implements SaveAndReadService {
             logger.info(section.toString());
 
         }
-        section.setJobstate(State.DONE.getState());
+//        section.setJobstate(State.DONE.getState());
+        job.setJobstate(State.DONE.getState());
+        jobRepository.save(job);
         sectionRepository.save(section);
     }
 
     @Override
-    @Async
-    public void save() {
+    public void save(Long id) {
 
+        try {
+            try (FileOutputStream loadFile = new FileOutputStream("result.xlsx")) {
+                try {
+                    book.write(loadFile);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     @Async
-    public void export(List<Section> all) {
+    public void export(List<Section> all, Long jobId) {
         logger.info("EXPORT XLSX");
+
+        Job job = new Job();
+        job.setId(jobId);
+        job.setJobstate(State.IN_PROGRESS.getState());
+        jobRepository.save(job);
+
         book = new XSSFWorkbook();
         XSSFSheet sheet = book.createSheet("Sheet 1");
 
@@ -159,7 +195,8 @@ public class SaveAndReadServiceImpl implements SaveAndReadService {
             rowForClass++;
 
         }
-        section.setJobstate(State.DONE.getState());
+        job.setJobstate(State.DONE.getState());
+        jobRepository.save(job);
         sectionRepository.save(section);
     }
 

@@ -1,14 +1,17 @@
 package ru.paracells.natlex.service;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface JobService {
 
-    String getJobState(Integer jobId);
+    String getJobState(Long jobId);
 
-    Integer startImportJob(MultipartFile file);
+    Long startImportJob(MultipartFile file);
 
-    Integer startJExportJob();
+    String startJExportJob();
+
+    ResponseEntity<String>  saveFile(Long id);
 
 }
 

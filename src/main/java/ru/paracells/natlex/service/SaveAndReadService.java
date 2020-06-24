@@ -7,9 +7,9 @@ import java.util.List;
 
 public interface SaveAndReadService {
 
-    void read(MultipartFile file, int jobId);
+    void read(MultipartFile file, Long jobId);
 
-    void save();
+    void save(Long id);
 
-    void export(List<Section> list);
+    void export(List<Section> list, Long jobId);
 }

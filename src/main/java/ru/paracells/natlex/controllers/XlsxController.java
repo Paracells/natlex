@@ -4,7 +4,6 @@ package ru.paracells.natlex.controllers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -38,37 +37,39 @@ public class XlsxController {
     // import (file) returns ID of the Async Job and launches importing.
 
     @PostMapping("/import")
-    public Integer importFile(@RequestParam("file") MultipartFile file) {
-        Integer integer = jobService.startImportJob(file);
-        return integer;
+    public Long importFile(@RequestParam("file") MultipartFile file) {
+        Long jobId = jobService.startImportJob(file);
+        return jobId;
 
     }
 
     @GetMapping("/import/{id}")
-    public String importFile(@PathVariable("id") Integer id) {
+    public String importFile(@PathVariable("id") Long id) {
         return jobService.getJobState(id);
     }
 
 
     // export returns ID of the Async Job and launches exporting.
     @GetMapping("/export")
-    public Integer exportToXLS() {
-        Integer integer = jobService.startJExportJob();
-        return integer;
+    public String exportToXLS() {
+        String jobId = jobService.startJExportJob();
+        return jobId;
     }
 
 
     // API GET /export/{id} returns result of parsed file by Job ID ("DONE", "IN PROGRESS", "ERROR") 
     @GetMapping("/export/{id}")
-    public String resultParsed(@PathVariable("id") Integer id) {
+    public String resultParsed(@PathVariable("id") Long id) {
+
         return jobService.getJobState(id);
     }
 
     // export/{id} returns result of parsed file by Job ID ("DONE", "IN PROGRESS", "ERROR") 
     @GetMapping("/export/{id}/file")
-    public ResponseEntity<String> exportWithId(@PathVariable("id") Integer id) {
+    public ResponseEntity<String> exportWithId(@PathVariable("id") Long id) {
 
-        if (checkFile(id).equals(State.ERROR.getTitle()))
+        return jobService.saveFile(id);
+        /*if (checkFile(id).equals(State.ERROR.getTitle()))
             return new ResponseEntity<>("There is no file with id: " + id, HttpStatus.INTERNAL_SERVER_ERROR);
         if (map.get(id).equals(State.DONE.getTitle())) {
 //            XLSService.saveBook();
@@ -77,7 +78,7 @@ public class XlsxController {
             return new ResponseEntity<>("file is not ready, status: " + map.get(id),
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>("filename: result.xlsx", HttpStatus.OK);
+        return new ResponseEntity<>("filename: result.xlsx", HttpStatus.OK);*/
 
     }
 

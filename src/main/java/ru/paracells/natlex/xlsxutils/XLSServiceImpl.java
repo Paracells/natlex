@@ -1,3 +1,4 @@
+/*
 package ru.paracells.natlex.xlsxutils;
 
 import org.apache.poi.ss.usermodel.Cell;
@@ -145,8 +146,9 @@ public class XLSServiceImpl implements XLSService {
             rowForClass++;
 
         }
-      /*  book.write(fileOut);
-        fileOut.close();*/
+  book.write(fileOut);
+        fileOut.close();
+
     }
 
     @Override
@@ -166,3 +168,4 @@ public class XLSServiceImpl implements XLSService {
 
     }
 }
+*/
