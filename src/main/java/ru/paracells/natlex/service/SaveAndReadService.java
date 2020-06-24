@@ -1,13 +1,14 @@
 package ru.paracells.natlex.service;
 
-import org.springframework.web.multipart.MultipartFile;
 import ru.paracells.natlex.models.Section;
 
+import java.io.InputStream;
 import java.util.List;
+import java.util.concurrent.Future;
 
 public interface SaveAndReadService {
 
-    void read(MultipartFile file, Long jobId);
+    Future<Void> read(InputStream stream, Long jobId);
 
     void save(Long id);
 

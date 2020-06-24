@@ -11,6 +11,8 @@ import ru.paracells.natlex.models.Section;
 import ru.paracells.natlex.repository.JobRepository;
 import ru.paracells.natlex.repository.SectionRepository;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
@@ -49,7 +51,12 @@ public class JobServiceImpl implements JobService {
     @Override
     public Long startImportJob(MultipartFile file) {
         Long jobId = atomicInteger.incrementAndGet();
-        saveAndReadService.read(file, jobId);
+        try {
+            InputStream inputStream = file.getInputStream();
+            saveAndReadService.read(inputStream, jobId);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return jobId;
     }
 

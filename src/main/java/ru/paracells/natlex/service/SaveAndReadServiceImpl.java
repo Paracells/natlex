@@ -12,8 +12,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 import ru.paracells.natlex.controllers.MainController;
 import ru.paracells.natlex.models.GeologicalClass;
 import ru.paracells.natlex.models.Job;
@@ -23,9 +23,11 @@ import ru.paracells.natlex.repository.SectionRepository;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.Future;
 
 @Service
 public class SaveAndReadServiceImpl implements SaveAndReadService {
@@ -33,14 +35,13 @@ public class SaveAndReadServiceImpl implements SaveAndReadService {
     @Value("${app.pause}")
     private Integer pause;
 
-    private XSSFWorkbook book;
-
+    private volatile XSSFWorkbook book;
 
     private Logger logger = LoggerFactory.getLogger(MainController.class);
 
 
-    private Section section;
-    private GeologicalClass geologicalClass;
+    private volatile Section section;
+    private volatile GeologicalClass geologicalClass;
 
     private SectionRepository sectionRepository;
 
@@ -52,20 +53,23 @@ public class SaveAndReadServiceImpl implements SaveAndReadService {
         this.jobRepository = jobRepository;
     }
 
-    @Override
     @Async
-    public void read(MultipartFile file, Long jobId) {
-
-        try {
-            book = (XSSFWorkbook) WorkbookFactory.create(file.getInputStream());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    @Override
+    public Future<Void> read(InputStream stream, Long jobId) {
 
         Job job = new Job();
 
         job.setId(jobId);
         job.setJobname("import");
+        try {
+
+            book = (XSSFWorkbook) WorkbookFactory.create(stream);
+        } catch (IOException e) {
+            job.setJobstate(State.ERROR.getState());
+            jobRepository.save(job);
+            return new AsyncResult<>(null);
+        }
+
         job.setJobstate(State.IN_PROGRESS.getState());
         jobRepository.save(job);
 
@@ -75,7 +79,7 @@ public class SaveAndReadServiceImpl implements SaveAndReadService {
         if (!checkCellRowForSection.getCell(0).toString().toLowerCase().contains("section")) {
             job.setJobstate(State.ERROR.getState());
             jobRepository.save(job);
-            return;
+            return new AsyncResult<>(null);
         }
         sheet.removeRow(sheet.getRow(0));
 
@@ -96,8 +100,6 @@ public class SaveAndReadServiceImpl implements SaveAndReadService {
                     section.setName(value);
 
 
-                /*    section.setJobid(jobId);
-                    section.setJobstate(State.IN_PROGRESS.getState());*/
                 } else if (value.contains("Geo")) {
                     geologicalClass.setName(value);
                 } else if (value.contains("GC")) {
@@ -105,6 +107,9 @@ public class SaveAndReadServiceImpl implements SaveAndReadService {
                     section.getGeoClasses().add(geologicalClass);
                     geologicalClass = new GeologicalClass();
                 } else {
+                    job.setJobstate(State.ERROR.getState());
+                    jobRepository.save(job);
+                    return new AsyncResult<>(null);
                 }
 
             }
@@ -112,10 +117,11 @@ public class SaveAndReadServiceImpl implements SaveAndReadService {
             logger.info(section.toString());
 
         }
-//        section.setJobstate(State.DONE.getState());
         job.setJobstate(State.DONE.getState());
         jobRepository.save(job);
         sectionRepository.save(section);
+        return new AsyncResult<>(null);
+
     }
 
     @Override
